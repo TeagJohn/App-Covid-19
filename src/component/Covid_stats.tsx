@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import axios from 'axios';
 import { Row, Col, Input, Form, Avatar } from 'antd';
 import { FixedSizeList as List } from 'react-window';
-import AutoSizer from 'react-virtualized-auto-sizer';
 
 interface CountryData {
   country: string;
@@ -11,6 +10,8 @@ interface CountryData {
   deaths: number;
   recovered: number;
 }
+
+const { Search } = Input;
 
 const CovidStats: React.FC = () => {
   const [data, setData] = useState<CountryData[]>([]);
@@ -71,22 +72,19 @@ const CovidStats: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    getData();
-    const interval = setInterval(getData, 30000);
+    const interval = setInterval(() => getData(), 30000);
     return () => clearInterval(interval);
-  }, [getData]);
+  }, []);
 
   const handleSearchByCountry = (values: { country: string }) => {
     setSearchTerm(values.country);
   };
 
   // Hàm render một hàng trong danh sách
-  const RowRenderer = ({ index, style }: { index: number; style: React.CSSProperties }) => {
-    const item = filteredData[index];
+  const RowRenderer = ({ index, item }: { index: number; item: CountryData }) => {
     return (
       <div
         style={{
-          ...style,
           display: 'flex',
           alignItems: 'center',
           padding: '10px',
@@ -107,9 +105,9 @@ const CovidStats: React.FC = () => {
   };
 
   return (
-    <Col span={24}>
+    <div style={{ margin: 'auto', width: "400px"}}>
       <Col
-        span={12}
+        span={24}
         style={{
           background: '#f0f2f5',
           padding: '20px',
@@ -119,39 +117,39 @@ const CovidStats: React.FC = () => {
         }}
       >
         <h1 style={{ color: 'red' }}>{totalCases}</h1>
-        <Col span={24} style={{ display: 'flex' }}>
-          <Col span={12} style={{ display: 'flex', flexDirection: 'column' }}>
-            <h2>{totalDeaths}</h2>
-            <b style={{ opacity: 0.5 }}>DEATHS</b>
+        <Col span={24} style={{ display: 'flex', marginBottom: "16px" }}>
+          <Col span={12}>
+            <h2 style={{ marginTop: 0, marginBottom: "8px" }}>{totalDeaths}</h2>
+            <b style={{ color: "#ccc" }}>DEATHS</b>
           </Col>
-          <Col span={12} style={{ display: 'flex', flexDirection: 'column' }}>
-            <h2>{totalRecovered}</h2>
-            <b style={{ opacity: 0.5 }}>RECOVERIES</b>
+          <Col span={12}>
+            <h2 style={{ marginTop: 0, marginBottom: "8px" }}>{totalRecovered}</h2>
+            <b style={{ color: "#ccc" }}>RECOVERIES</b>
           </Col>
         </Col>
         <Col>
           <Form onFinish={handleSearchByCountry}>
             <Form.Item name={'country'}>
-              <Input placeholder="Search..." style={{ width: '500px' }} />
+              <Search placeholder="Search..." style={{ width: '100%' }} />
             </Form.Item>
           </Form>
         </Col>
-        <Col style={{ height: 500, width: '100%' }}>
-          <AutoSizer>
-            {({ height, width }: { height: number; width: number }) => (
-              <List
-                height={height}
-                itemCount={filteredData.length}
-                itemSize={60}
-                width={width}
-              >
-                {RowRenderer}
-              </List>
-            )}
-          </AutoSizer>
+        <Col style={{ maxHeight: "505px", overflow: "overlay" }}>
+          <Col>
+            {
+              filteredData.map((item, i) => (
+                <RowRenderer index={i} item={item} />
+              ))
+            }
+            {
+              !filteredData.length && (
+                <p>Không có dữ liệu...</p>
+              )
+            }
+          </Col>
         </Col>
       </Col>
-    </Col>
+    </div>
   );
 };
 
