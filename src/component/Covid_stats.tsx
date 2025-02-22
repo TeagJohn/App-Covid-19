@@ -72,6 +72,7 @@ const CovidStats: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    getData();
     const interval = setInterval(() => getData(), 30000);
     return () => clearInterval(interval);
   }, []);
