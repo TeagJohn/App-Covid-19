@@ -60,7 +60,6 @@ const CovidStats: React.FC = () => {
           top100.unshift(vietnamInTop);
         }
       }
-      console.log("vào");
       
       setTotalcases(top100.reduce((total, item) => total + item.cases, 0).toLocaleString());
       setTotalDeaths(top100.reduce((total, item) => total + item.deaths, 0).toLocaleString());
